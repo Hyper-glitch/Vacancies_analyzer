@@ -28,33 +28,37 @@ class BaseApi:
 
 class HeadHunterApi(BaseApi):
 
-    def get_authorization_code(self):
-        endpoint = 'oauth/authorize'
-        url = f'https://hh.ru/{endpoint}'
-        params = {
-            'response_type': 'code',
-            'client_id': 83918056,
-        }
-        authorization_code = self.session.post(url=url, params=params)
+    def get_professional_roles(self):
+        endpoint = 'professional_roles'
+        professional_roles = self.get_json(endpoint=endpoint)
+        return professional_roles['categories']
 
-    def get_access_token(self, client_id: str, client_secret: str):
-        endpoint = 'oauth/token'
-        url = f'https://hh.ru/{endpoint}'
-        params = {
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'grant_type': 'client_credentials',
-        }
-        access_token = self.session.post(url=url, params=params)
-        access_token.raise_for_status()
-        return access_token
+    def get_role_id(self, query_industry, query_job, roles):
+        industry_jobs = None
 
-    def get_vacancies(self, query):
-        endpoint = f'vacancies/{query}'
-        vacancies = self.get_json(endpoint=endpoint)
+        for role in roles:
+            if query_industry in role['name']:
+                industry_jobs = role['roles']
+
+        for industry_job in industry_jobs:
+            if query_job in industry_job['name']:
+                role_id = industry_job['id']
+                return role_id
+
+    def get_vacancies(self, role_id):
+        endpoint = 'vacancies'
+        params = {'professional_role': role_id}
+        vacancies = self.get_json(endpoint=endpoint, params=params)
         return vacancies
 
 
 if __name__ == '__main__':
     hh_api = HeadHunterApi(base_url=HH_BASE_API_URL, headers=HH_HEADERS)
-    developer_vacancies = hh_api.get_authorization_code()
+
+    professional_roles = hh_api.get_professional_roles()
+    developer_role_id = hh_api.get_role_id(
+        query_industry='Информационные технологии',
+        query_job='Программист',
+        roles=professional_roles,
+    )
+    developer_vacancies = hh_api.get_vacancies(role_id=developer_role_id)
