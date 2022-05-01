@@ -10,6 +10,7 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
     hh_base_url = 'https://api.hh.ru/'
     hh_api = HeadHunterApi(base_url=hh_base_url, headers=hh_headers)
     saint_petersburg = 2
+    period = 30
 
     professional_roles = hh_api.get_professional_roles()
     developer_role_id = hh_api.get_role_id(
@@ -17,7 +18,7 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
         query_job='Программист',
         roles=professional_roles,
     )
-    developer_vacancies = hh_api.get_vacancies(role_id=developer_role_id, area_id=saint_petersburg)
+    developer_vacancies = hh_api.get_vacancies(role_id=developer_role_id, area_id=saint_petersburg, period=period)
     return developer_vacancies
 
 
@@ -26,6 +27,7 @@ def main():
     load_dotenv()
     hh_app_name = os.environ.get("HH_APP_NAME")
     hh_app_email = os.environ.get("HH_APP_EMAIL")
+
     run_vacancies_analyzer(hh_app_name=hh_app_name, hh_app_email=hh_app_email)
 
 
