@@ -2,8 +2,6 @@ import urllib.parse as urllib
 
 import requests
 
-from apis_constants import HH_HEADERS, HH_BASE_API_URL
-
 
 class BaseApi:
     """Base API class which implements with all repeatable attributes and methods."""
@@ -45,20 +43,11 @@ class HeadHunterApi(BaseApi):
                 role_id = industry_job['id']
                 return role_id
 
-    def get_vacancies(self, role_id):
+    def get_vacancies(self, role_id, area_id):
         endpoint = 'vacancies'
-        params = {'professional_role': role_id}
+        params = {
+            'professional_role': role_id,
+            'area': area_id,
+        }
         vacancies = self.get_json(endpoint=endpoint, params=params)
         return vacancies
-
-
-if __name__ == '__main__':
-    hh_api = HeadHunterApi(base_url=HH_BASE_API_URL, headers=HH_HEADERS)
-
-    professional_roles = hh_api.get_professional_roles()
-    developer_role_id = hh_api.get_role_id(
-        query_industry='Информационные технологии',
-        query_job='Программист',
-        roles=professional_roles,
-    )
-    developer_vacancies = hh_api.get_vacancies(role_id=developer_role_id)
