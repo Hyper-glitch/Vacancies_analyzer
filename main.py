@@ -1,11 +1,14 @@
+import os
+
 from dotenv import load_dotenv
 
-from apis_constants import HH_BASE_API_URL, HH_HEADERS
 from job_platforms_APIs import HeadHunterApi
 
 
-def run_vacancies_analyzer():
-    hh_api = HeadHunterApi(base_url=HH_BASE_API_URL, headers=HH_HEADERS)
+def run_vacancies_analyzer(hh_app_name, hh_app_email):
+    hh_headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
+    hh_base_url = 'https://api.hh.ru/'
+    hh_api = HeadHunterApi(base_url=hh_base_url, headers=hh_headers)
     saint_petersburg = 2
 
     professional_roles = hh_api.get_professional_roles()
@@ -21,9 +24,9 @@ def run_vacancies_analyzer():
 def main():
     """The main logic for running the whole program."""
     load_dotenv()
-
-
-    run_vacancies_analyzer()
+    hh_app_name = os.environ.get("HH_APP_NAME")
+    hh_app_email = os.environ.get("HH_APP_EMAIL")
+    run_vacancies_analyzer(hh_app_name=hh_app_name, hh_app_email=hh_app_email)
 
 
 if __name__ == '__main__':
