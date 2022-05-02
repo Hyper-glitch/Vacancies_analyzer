@@ -30,7 +30,10 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
             period=period, text=search_text
         )
         vacancies_amount[f'{language}'] = developer_vacancies['found']
-    print(vacancies_amount)
+
+        if language == 'Python':
+            python_salaries = hh_api.predict_rub_salary(developer_vacancies['items'])
+            print(python_salaries)
 
 
 def main():
