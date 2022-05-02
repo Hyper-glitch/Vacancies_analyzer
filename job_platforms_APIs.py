@@ -43,9 +43,10 @@ class HeadHunterApi(BaseApi):
                 role_id = industry_job['id']
                 return role_id
 
-    def get_vacancies(self, role_id, area_id, period):
+    def get_vacancies(self, text, role_id, area_id, period):
         endpoint = 'vacancies'
         params = {
+            'text': text,
             'professional_role': role_id,
             'area': area_id,
             'period': period,
