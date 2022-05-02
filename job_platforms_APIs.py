@@ -43,14 +43,9 @@ class HeadHunterApi(BaseApi):
                 role_id = industry_job['id']
                 return role_id
 
-    def get_vacancies(self, text, role_id, area_id, period):
+    def get_vacancies(self, params, page=None):
         endpoint = 'vacancies'
-        params = {
-            'text': text,
-            'professional_role': role_id,
-            'area': area_id,
-            'period': period,
-        }
+        params.update({'page': page})
         vacancies = self.get_json(endpoint=endpoint, params=params)
         return vacancies
 
@@ -79,3 +74,17 @@ class HeadHunterApi(BaseApi):
 
             expected_salaries.append(int(expected_salary))
         return expected_salaries
+
+    def get_all_vacancies(self, params):
+        all_vacancies = []
+        page, pages = self.get_number_pages(params)
+
+        while page < pages:
+            vacancies = self.get_vacancies(params, page=page)
+            all_vacancies.extend(vacancies['items'])
+            page += 1
+        return all_vacancies
+
+    def get_number_pages(self, params):
+        vacancies = self.get_vacancies(params)
+        return vacancies['page'], vacancies['pages']
