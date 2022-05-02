@@ -13,7 +13,7 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
     popular_programming_languages = ['JavaScript', 'C#', 'Java',
                                      'Python', 'PHP', 'TypeScript',
                                      'Kotlin', 'Swift', 'C++', 'Go']
-    vacancies_amount = {}
+    analyzed_language_vacancies = {}
 
     hh_api = HeadHunterApi(base_url=hh_base_url, headers=hh_headers)
     professional_roles = hh_api.get_professional_roles()
@@ -29,11 +29,19 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
             role_id=developer_role_id, area_id=area_id,
             period=period, text=search_text
         )
-        vacancies_amount[f'{language}'] = developer_vacancies['found']
 
-        if language == 'Python':
-            python_salaries = hh_api.predict_rub_salary(developer_vacancies['items'])
-            print(python_salaries)
+        all_vacancies = developer_vacancies['found']
+        expected_salaries = hh_api.predict_rub_salary(developer_vacancies['items'])
+        vacancies_processed = len(expected_salaries)
+        average_salary = sum(expected_salaries) / vacancies_processed
+
+        analyzed_vacancies = {
+            'vacancies_found': all_vacancies,
+            'vacancies_processed': vacancies_processed,
+            'average_salary': int(average_salary),
+        }
+
+        analyzed_language_vacancies[f'{language}'] = analyzed_vacancies
 
 
 def main():
