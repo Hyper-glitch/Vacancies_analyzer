@@ -56,6 +56,8 @@ class HeadHunterApi(BaseApi):
 
     @staticmethod
     def predict_rub_salary(vacancies):
+        expected_salaries = []
+
         for vacancy in vacancies:
             salary = vacancy['salary']
             if not salary:
@@ -75,4 +77,5 @@ class HeadHunterApi(BaseApi):
             elif not start_salary:
                 expected_salary = end_salary * 0.8
 
-            print(int(expected_salary))
+            expected_salaries.append(int(expected_salary))
+        return expected_salaries
