@@ -8,18 +8,29 @@ from job_platforms_APIs import HeadHunterApi
 def run_vacancies_analyzer(hh_app_name, hh_app_email):
     hh_headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
     hh_base_url = 'https://api.hh.ru/'
-    hh_api = HeadHunterApi(base_url=hh_base_url, headers=hh_headers)
-    saint_petersburg = 2
+    area_id = 2  # saint petersburg
     period = 30
+    popular_programming_languages = ['JavaScript', 'C#', 'Java',
+                                     'Python', 'PHP', 'TypeScript',
+                                     'Kotlin', 'Swift', 'C++', 'Go']
+    vacancies_amount = {}
 
+    hh_api = HeadHunterApi(base_url=hh_base_url, headers=hh_headers)
     professional_roles = hh_api.get_professional_roles()
     developer_role_id = hh_api.get_role_id(
         query_industry='Информационные технологии',
         query_job='Программист',
         roles=professional_roles,
     )
-    developer_vacancies = hh_api.get_vacancies(role_id=developer_role_id, area_id=saint_petersburg, period=period)
-    return developer_vacancies
+
+    for language in popular_programming_languages:
+        search_text = f'Программист {language}'
+        developer_vacancies = hh_api.get_vacancies(
+            role_id=developer_role_id, area_id=area_id,
+            period=period, text=search_text
+        )
+        vacancies_amount[f'{language}'] = developer_vacancies['found']
+    print(vacancies_amount)
 
 
 def main():
