@@ -53,3 +53,26 @@ class HeadHunterApi(BaseApi):
         }
         vacancies = self.get_json(endpoint=endpoint, params=params)
         return vacancies
+
+    @staticmethod
+    def predict_rub_salary(vacancies):
+        for vacancy in vacancies:
+            salary = vacancy['salary']
+            if not salary:
+                continue
+
+            currency = salary['currency']
+            start_salary = salary['from']
+            end_salary = salary['to']
+            expected_salary = None
+
+            if currency != 'RUR':
+                expected_salary = None
+            if start_salary and end_salary:
+                expected_salary = (start_salary + end_salary) / 2
+            elif start_salary:
+                expected_salary = start_salary * 1.2
+            elif not start_salary:
+                expected_salary = end_salary * 0.8
+
+            print(int(expected_salary))
