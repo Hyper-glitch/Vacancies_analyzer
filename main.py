@@ -25,23 +25,29 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
 
     for language in popular_programming_languages:
         search_text = f'Программист {language}'
-        developer_vacancies = hh_api.get_vacancies(
-            role_id=developer_role_id, area_id=area_id,
-            period=period, text=search_text
-        )
+        per_page = 100
+        params = {
+            'text': search_text,
+            'professional_role': developer_role_id,
+            'area': area_id,
+            'period': period,
+            'per_page': per_page,
+        }
+        all_vacancies = hh_api.get_all_vacancies(params=params)
 
-        all_vacancies = developer_vacancies['found']
-        expected_salaries = hh_api.predict_rub_salary(developer_vacancies['items'])
+        vacancies_found = len(all_vacancies)
+        expected_salaries = hh_api.predict_rub_salary(all_vacancies)
         vacancies_processed = len(expected_salaries)
         average_salary = sum(expected_salaries) / vacancies_processed
 
         analyzed_vacancies = {
-            'vacancies_found': all_vacancies,
+            'vacancies_found': vacancies_found,
             'vacancies_processed': vacancies_processed,
             'average_salary': int(average_salary),
         }
 
         analyzed_language_vacancies[f'{language}'] = analyzed_vacancies
+    print(analyzed_language_vacancies)
 
 
 def main():
