@@ -24,6 +24,20 @@ class BaseApi:
         return response.json()
 
 
+class SuperJob(BaseApi):
+    def get_authorize(self, client_id, secret_key, code):
+        url = 'https://www.superjob.ru/authorize/'
+        params = {
+            'client_id': client_id,
+            'client_secret': secret_key,
+            'redirect_uri': 'https://api.superjob.ru',
+            'code': code,
+        }
+        response = self.session.get(url='https://api.superjob.ru/2.0/oauth2/access_token/', params=params)
+        response.raise_for_status()
+        access_token = response.json()
+
+
 class HeadHunterApi(BaseApi):
 
     def get_professional_roles(self):
