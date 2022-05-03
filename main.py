@@ -2,12 +2,12 @@ import os
 
 from dotenv import load_dotenv
 
-from job_platforms_APIs import HeadHunterApi
+from job_platforms_APIs import HeadHunterApi, SuperJob
 
 
-def run_vacancies_analyzer(hh_app_name, hh_app_email):
-    hh_headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
-    hh_base_url = 'https://api.hh.ru/'
+def run_head_hunter_analyzer(hh_app_name, hh_app_email):
+    headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
+    base_url = 'https://api.hh.ru/'
     area_id = 2  # saint petersburg
     period = 30
     popular_programming_languages = ['JavaScript', 'C#', 'Java',
@@ -15,7 +15,7 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
                                      'Kotlin', 'Swift', 'C++', 'Go']
     analyzed_language_vacancies = {}
 
-    hh_api = HeadHunterApi(base_url=hh_base_url, headers=hh_headers)
+    hh_api = HeadHunterApi(base_url=base_url, headers=headers)
     professional_roles = hh_api.get_professional_roles()
     developer_role_id = hh_api.get_role_id(
         query_industry='Информационные технологии',
@@ -50,13 +50,24 @@ def run_vacancies_analyzer(hh_app_name, hh_app_email):
     print(analyzed_language_vacancies)
 
 
+def run_super_job_analyzer(client_id, secret_key, code):
+    headers = {'X-Api-App-Id': secret_key}
+    base_url = 'https://api.superjob.ru/2.0/'
+    api_instance = SuperJob(base_url=base_url, headers=headers)
+    api_instance.get_authorize(client_id=client_id, secret_key=secret_key, code=code)
+
+
 def main():
     """The main logic for running the whole program."""
     load_dotenv()
     hh_app_name = os.environ.get("HH_APP_NAME")
     hh_app_email = os.environ.get("HH_APP_EMAIL")
+    client_id = int(os.environ.get("SUPER_JOB_CLIENT_ID"))
+    secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
+    code = os.environ.get("CODE")
 
-    run_vacancies_analyzer(hh_app_name=hh_app_name, hh_app_email=hh_app_email)
+    # run_head_hunter_analyzer(hh_app_name=hh_app_name, hh_app_email=hh_app_email)
+    run_super_job_analyzer(client_id=client_id, secret_key=secret_key, code=code)
 
 
 if __name__ == '__main__':
