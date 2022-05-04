@@ -45,6 +45,36 @@ class SuperJob(BaseApi):
         access_token = self.get_json(endpoint=endpoint, params=params)['access_token']
         return access_token
 
+    def get_vacancies(self, client_id, secret_key, catalogues, keyword, town):
+        endpoint = 'vacancies'
+        params = {
+            'client_id': client_id,
+            'client_secret': secret_key,
+            'catalogues': catalogues,
+            'keyword': keyword,
+            'town': town,
+        }
+        vacancies = self.get_json(endpoint=endpoint, params=params)['objects']
+        return vacancies
+
+    @staticmethod
+    def predict_rub_salary(vacancies):
+        expected_salaries = []
+
+        for vacancy in vacancies:
+            currency = vacancy['currency']
+            start_salary = vacancy['payment_from']
+            end_salary = vacancy['payment_to']
+            currency_name = 'rub'
+
+            expected_salary = predict_salary(
+                currency=currency, start_salary=start_salary,
+                end_salary=end_salary, currency_name=currency_name
+            )
+
+            expected_salaries.append(expected_salary)
+        return expected_salaries
+
 
 class HeadHunterApi(BaseApi):
 
@@ -77,22 +107,19 @@ class HeadHunterApi(BaseApi):
 
         for vacancy in vacancies:
             salary = vacancy['salary']
+
             if not salary:
                 continue
 
             currency = salary['currency']
             start_salary = salary['from']
             end_salary = salary['to']
-            expected_salary = None
+            currency_name = 'RUR'
 
-            if currency != 'RUR':
-                expected_salary = None
-            if start_salary and end_salary:
-                expected_salary = (start_salary + end_salary) / 2
-            elif start_salary:
-                expected_salary = start_salary * 1.2
-            elif not start_salary:
-                expected_salary = end_salary * 0.8
+            expected_salary = predict_salary(
+                currency=currency, start_salary=start_salary,
+                end_salary=end_salary, currency_name=currency_name
+            )
 
             expected_salaries.append(int(expected_salary))
         return expected_salaries
@@ -110,3 +137,18 @@ class HeadHunterApi(BaseApi):
     def get_number_pages(self, params):
         vacancies = self.get_vacancies(params)
         return vacancies['page'], vacancies['pages']
+
+
+def predict_salary(currency, start_salary, end_salary, currency_name):
+    expected_salary = None
+
+    if currency != currency_name:
+        return
+    if start_salary and end_salary:
+        expected_salary = (start_salary + end_salary) / 2
+    elif start_salary:
+        expected_salary = start_salary * 1.2
+    elif not start_salary and end_salary:
+        expected_salary = end_salary * 0.8
+
+    return int(expected_salary) if expected_salary else None
