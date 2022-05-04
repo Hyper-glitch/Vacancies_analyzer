@@ -53,9 +53,20 @@ def run_head_hunter_analyzer(hh_app_name, hh_app_email):
 def run_super_job_analyzer(client_id, secret_key, code):
     headers = {'X-Api-App-Id': secret_key}
     base_url = 'https://api.superjob.ru/2.0/'
+    keyword = 'Developer'
+    town = 'Санкт-Петербург'
+    catalogues = 33
+
     api_instance = SuperJob(base_url=base_url, headers=headers)
-    api_instance.get_authorize(client_id=client_id)
-    api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
+    # api_instance.get_authorize(client_id=client_id)
+    # api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
+    vacancies = api_instance.get_vacancies(
+        client_id=client_id, secret_key=secret_key, catalogues=catalogues,
+        keyword=keyword, town=town
+    )
+    expected_salaries = api_instance.predict_rub_salary(vacancies)
+    for vacancie in vacancies:
+        print(vacancie.get('profession'), ',', vacancie['town']['title'])
 
 
 def main():
@@ -63,12 +74,12 @@ def main():
     load_dotenv()
     hh_app_name = os.environ.get("HH_APP_NAME")
     hh_app_email = os.environ.get("HH_APP_EMAIL")
-    client_id = int(os.environ.get("SUPER_JOB_CLIENT_ID"))
-    secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
-    code = os.environ.get("CODE")
+    sj_client_id = int(os.environ.get("SUPER_JOB_CLIENT_ID"))
+    sj_secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
+    sj_code = os.environ.get("CODE")
 
     # run_head_hunter_analyzer(hh_app_name=hh_app_name, hh_app_email=hh_app_email)
-    run_super_job_analyzer(client_id=client_id, secret_key=secret_key, code=code)
+    run_super_job_analyzer(client_id=sj_client_id, secret_key=sj_secret_key, code=sj_code)
 
 
 if __name__ == '__main__':
