@@ -25,17 +25,25 @@ class BaseApi:
 
 
 class SuperJob(BaseApi):
-    def get_authorize(self, client_id, secret_key, code):
+    def get_authorize(self, client_id):
         url = 'https://www.superjob.ru/authorize/'
+        params = {
+            'client_id': client_id,
+            'redirect_uri': 'https://api.superjob.ru',
+        }
+        response = self.session.get(url=url, params=params)
+        response.raise_for_status()
+
+    def get_access_token(self, client_id, secret_key, code):
+        endpoint = 'oauth2/access_token/'
         params = {
             'client_id': client_id,
             'client_secret': secret_key,
             'redirect_uri': 'https://api.superjob.ru',
             'code': code,
         }
-        response = self.session.get(url='https://api.superjob.ru/2.0/oauth2/access_token/', params=params)
-        response.raise_for_status()
-        access_token = response.json()
+        access_token = self.get_json(endpoint=endpoint, params=params)['access_token']
+        return access_token
 
 
 class HeadHunterApi(BaseApi):
