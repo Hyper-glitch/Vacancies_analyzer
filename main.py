@@ -54,7 +54,8 @@ def run_super_job_analyzer(client_id, secret_key, code):
     headers = {'X-Api-App-Id': secret_key}
     base_url = 'https://api.superjob.ru/2.0/'
     api_instance = SuperJob(base_url=base_url, headers=headers)
-    api_instance.get_authorize(client_id=client_id, secret_key=secret_key, code=code)
+    api_instance.get_authorize(client_id=client_id)
+    api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
 
 
 def main():
