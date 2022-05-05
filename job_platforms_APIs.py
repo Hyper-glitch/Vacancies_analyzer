@@ -121,7 +121,7 @@ class HeadHunterApi(BaseApi):
                 end_salary=end_salary, currency_name=currency_name
             )
 
-            expected_salaries.append(int(expected_salary))
+            expected_salaries.append(expected_salary)
         return expected_salaries
 
     def get_all_vacancies(self, params):
