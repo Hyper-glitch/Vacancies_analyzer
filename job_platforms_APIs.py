@@ -27,8 +27,13 @@ class BaseApi:
 
 
 class SuperJob(BaseApi):
-    def get_authorize(self, client_id):
-        url = 'https://www.superjob.ru/authorize/'
+    """Class to interact with SuperJob API. Inherited from BaseApi"""
+
+    def get_authorize(self, client_id, url):
+        """Get code for getting access token.
+        :param client_id: - application ID registered in the API
+        :param url: - url for user authorization request
+        """
         params = {
             'client_id': client_id,
             'redirect_uri': 'https://api.superjob.ru',
