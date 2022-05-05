@@ -5,14 +5,12 @@ from dotenv import load_dotenv
 from job_platforms_APIs import HeadHunterApi, SuperJob
 
 
-def run_head_hunter_analyzer(hh_app_name, hh_app_email):
+def run_head_hunter_analyzer(popular_programming_languages, hh_app_name, hh_app_email):
     headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
     base_url = 'https://api.hh.ru/'
     area_id = 2  # saint petersburg
     period = 30
-    popular_programming_languages = ['JavaScript', 'C#', 'Java',
-                                     'Python', 'PHP', 'TypeScript',
-                                     'Kotlin', 'Swift', 'C++', 'Go']
+
     analyzed_language_vacancies = {}
 
     hh_api = HeadHunterApi(base_url=base_url, headers=headers)
@@ -50,23 +48,31 @@ def run_head_hunter_analyzer(hh_app_name, hh_app_email):
     print(analyzed_language_vacancies)
 
 
-def run_super_job_analyzer(client_id, secret_key, code):
+def run_super_job_analyzer(popular_programming_languages, client_id, secret_key, code):
     headers = {'X-Api-App-Id': secret_key}
     base_url = 'https://api.superjob.ru/2.0/'
-    keyword = 'Developer'
     town = 'Санкт-Петербург'
     catalogues = 33
 
     api_instance = SuperJob(base_url=base_url, headers=headers)
-    # api_instance.get_authorize(client_id=client_id)
-    # api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
-    vacancies = api_instance.get_vacancies(
-        client_id=client_id, secret_key=secret_key, catalogues=catalogues,
-        keyword=keyword, town=town
-    )
-    expected_salaries = api_instance.predict_rub_salary(vacancies)
-    for vacancie in vacancies:
-        print(vacancie.get('profession'), ',', vacancie['town']['title'])
+    api_instance.get_authorize(client_id=client_id)
+    api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
+
+    for language in popular_programming_languages:
+        search_text = f'Программист {language}'
+        all_vacancies = api_instance.get_vacancies(
+            client_id=client_id, secret_key=secret_key, catalogues=catalogues,
+            keyword=search_text, town=town
+        )
+        expected_salaries = api_instance.predict_rub_salary(all_vacancies)
+        vacancies_found = len(all_vacancies)
+        vacancies_processed = len(expected_salaries)
+        average_salary = sum(expected_salaries) / vacancies_processed
+        analyzed_vacancies = {
+            'vacancies_found': vacancies_found,
+            'vacancies_processed': vacancies_processed,
+            'average_salary': int(average_salary),
+        }
 
 
 def main():
@@ -77,9 +83,18 @@ def main():
     sj_client_id = int(os.environ.get("SUPER_JOB_CLIENT_ID"))
     sj_secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
     sj_code = os.environ.get("CODE")
+    popular_programming_languages = ['JavaScript', 'C#', 'Java',
+                                     'Python', 'PHP', 'TypeScript',
+                                     'Kotlin', 'Swift', 'C++', 'Go']
 
-    # run_head_hunter_analyzer(hh_app_name=hh_app_name, hh_app_email=hh_app_email)
-    run_super_job_analyzer(client_id=sj_client_id, secret_key=sj_secret_key, code=sj_code)
+    run_head_hunter_analyzer(
+        popular_programming_languages=popular_programming_languages, hh_app_name=hh_app_name,
+        hh_app_email=hh_app_email
+    )
+    run_super_job_analyzer(
+        popular_programming_languages=popular_programming_languages, client_id=sj_client_id,
+        secret_key=sj_secret_key, code=sj_code
+    )
 
 
 if __name__ == '__main__':
