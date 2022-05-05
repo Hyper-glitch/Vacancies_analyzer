@@ -2,6 +2,8 @@ import urllib.parse as urllib
 
 import requests
 
+from analyzer_tools import predict_salary
+
 
 class BaseApi:
     """Base API class which implements with all repeatable attributes and methods."""
@@ -137,18 +139,3 @@ class HeadHunterApi(BaseApi):
     def get_number_pages(self, params):
         vacancies = self.get_vacancies(params)
         return vacancies['page'], vacancies['pages']
-
-
-def predict_salary(currency, start_salary, end_salary, currency_name):
-    expected_salary = None
-
-    if currency != currency_name:
-        return
-    if start_salary and end_salary:
-        expected_salary = (start_salary + end_salary) / 2
-    elif start_salary:
-        expected_salary = start_salary * 1.2
-    elif not start_salary and end_salary:
-        expected_salary = end_salary * 0.8
-
-    return int(expected_salary) if expected_salary else None
