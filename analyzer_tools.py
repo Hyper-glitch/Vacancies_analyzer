@@ -10,4 +10,4 @@ def predict_salary(currency, start_salary, end_salary, currency_name):
     elif not start_salary and end_salary:
         expected_salary = end_salary * 0.8
 
-    return int(expected_salary) if expected_salary else None
+    return expected_salary
