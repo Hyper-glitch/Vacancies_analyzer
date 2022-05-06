@@ -78,8 +78,8 @@ class SuperJob(BaseApi):
                 currency=currency, start_salary=start_salary,
                 end_salary=end_salary, currency_name=currency_name
             )
-
-            expected_salaries.append(expected_salary)
+            if expected_salary:
+                expected_salaries.append(expected_salary)
         return expected_salaries
 
 
@@ -127,8 +127,9 @@ class HeadHunterApi(BaseApi):
                 currency=currency, start_salary=start_salary,
                 end_salary=end_salary, currency_name=currency_name
             )
+            if expected_salary:
+                expected_salaries.append(expected_salary)
 
-            expected_salaries.append(expected_salary)
         return expected_salaries
 
     def get_all_vacancies(self, params):
