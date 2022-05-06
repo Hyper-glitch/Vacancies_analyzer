@@ -54,10 +54,12 @@ def run_super_job_analyzer(popular_programming_languages, client_id, secret_key,
     auth_url = 'https://www.superjob.ru/authorize/'
     town = 'Санкт-Петербург'
     catalogues = 33
+    analyzed_language_vacancies = {}
 
     api_instance = SuperJob(base_url=base_url, headers=headers)
-    api_instance.get_authorize(client_id=client_id, url=auth_url)
-    api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
+    if not code:
+        api_instance.get_authorize(client_id=client_id, url=auth_url)
+        access_token = api_instance.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
 
     for language in popular_programming_languages:
         search_text = f'Программист {language}'
@@ -68,26 +70,31 @@ def run_super_job_analyzer(popular_programming_languages, client_id, secret_key,
         expected_salaries = api_instance.predict_rub_salary(all_vacancies)
         vacancies_found = len(all_vacancies)
         vacancies_processed = len(expected_salaries)
-        average_salary = sum(expected_salaries) / vacancies_processed
-        analyzed_vacancies = {
-            'vacancies_found': vacancies_found,
-            'vacancies_processed': vacancies_processed,
-            'average_salary': int(average_salary),
-        }
+        if vacancies_found and vacancies_processed:
+            average_salary = sum(expected_salaries) / vacancies_processed
+            analyzed_vacancies = {
+                'vacancies_found': vacancies_found,
+                'vacancies_processed': vacancies_processed,
+                'average_salary': int(average_salary),
+            }
+            analyzed_language_vacancies[f'{language}'] = analyzed_vacancies
+    print(analyzed_language_vacancies)
 
 
 def main():
     """The main logic for running the whole program."""
     load_dotenv()
+
     hh_app_name = os.environ.get("HH_APP_NAME")
     hh_app_email = os.environ.get("HH_APP_EMAIL")
+
     sj_client_id = int(os.environ.get("SUPER_JOB_CLIENT_ID"))
     sj_secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
     sj_code = os.environ.get("CODE")
+
     popular_programming_languages = ['JavaScript', 'C#', 'Java',
                                      'Python', 'PHP', 'TypeScript',
                                      'Kotlin', 'Swift', 'C++', 'Go']
-
     run_head_hunter_analyzer(
         popular_programming_languages=popular_programming_languages, hh_app_name=hh_app_name,
         hh_app_email=hh_app_email
