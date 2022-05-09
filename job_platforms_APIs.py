@@ -52,15 +52,8 @@ class SuperJob(BaseApi):
         access_token = self.get_json(endpoint=endpoint, params=params)['access_token']
         return access_token
 
-    def get_vacancies(self, client_id, secret_key, catalogues, keyword, town):
+    def get_vacancies(self, params):
         endpoint = 'vacancies'
-        params = {
-            'client_id': client_id,
-            'client_secret': secret_key,
-            'catalogues': catalogues,
-            'keyword': keyword,
-            'town': town,
-        }
         vacancies = self.get_json(endpoint=endpoint, params=params)['objects']
         return vacancies
 
