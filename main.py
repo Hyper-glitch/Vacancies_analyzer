@@ -6,32 +6,33 @@ from analyzer_tools import get_analyzed_vacancies
 from job_platforms_APIs import HeadHunterApi, SuperJob
 
 
-def run_head_hunter_analyzer(programming_languages, hh_app_name, hh_app_email):
+def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_app_email: str):
     headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
     base_url = 'https://api.hh.ru/'
-    area_id = 2  # saint petersburg
+    area_id = 2  # todo add location resolver
     period = 30
     per_page = 100
 
     hh_api = HeadHunterApi(base_url=base_url, headers=headers)
+
     professional_roles = hh_api.get_professional_roles()
     developer_role_id = hh_api.get_role_id(
         query_industry='Информационные технологии',
         query_job='Программист',
         roles=professional_roles,
     )
-    get_vacancies_kwargs = {
+    params = {
         'professional_role': developer_role_id,
         'area': area_id,
         'period': period,
         'per_page': per_page,
     }
-    analyzed_language_vacancies = get_analyzed_vacancies(
+    analyzed_vacancies = get_analyzed_vacancies(
         api=hh_api, search_key='text',
         programming_languages=programming_languages,
-        get_vacancies_kwargs=get_vacancies_kwargs,
+        vacancies_params=params,
     )
-    print(analyzed_language_vacancies)
+    print(analyzed_vacancies)
 
 
 def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
@@ -40,7 +41,7 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
     auth_url = 'https://www.superjob.ru/authorize/'
     town = 'Санкт-Петербург'
     catalogues = 33
-    get_vacancies_kwargs = {
+    params = {
         'client_id': client_id,
         'secret_key': secret_key,
         'catalogues': catalogues,
@@ -55,7 +56,7 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
     analyzed_language_vacancies = get_analyzed_vacancies(
         api=sj_api, search_key='keyword',
         programming_languages=programming_languages,
-        get_vacancies_kwargs=get_vacancies_kwargs,
+        vacancies_params=params,
     )
     print(analyzed_language_vacancies)
 
@@ -77,8 +78,7 @@ def main():
         programming_languages=programming_languages, hh_app_name=hh_app_name, hh_app_email=hh_app_email,
     )
     run_super_job_analyzer(
-        programming_languages=programming_languages, client_id=sj_client_id,
-        secret_key=sj_secret_key, code=sj_code,
+        programming_languages=programming_languages, client_id=sj_client_id, secret_key=sj_secret_key, code=sj_code,
     )
 
 
