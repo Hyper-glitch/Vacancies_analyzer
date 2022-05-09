@@ -11,3 +11,32 @@ def predict_salary(currency, start_salary, end_salary, currency_name):
         expected_salary = end_salary * 0.8
 
     return expected_salary
+
+
+def get_analyzed_vacancies(api, programming_languages, search_key, get_vacancies_kwargs):
+    analyzed_language_vacancies = {}
+    super_job_indicator = 'keyword'
+
+    for language in programming_languages:
+        search_text = f'Программист {language}'
+        get_vacancies_kwargs.update({search_key: search_text})
+
+        if search_key == super_job_indicator:
+            all_vacancies = api.get_vacancies(**get_vacancies_kwargs)
+        else:
+            all_vacancies = api.get_all_vacancies(params=get_vacancies_kwargs)
+
+        expected_salaries = api.predict_rub_salary(all_vacancies)
+        vacancies_found = len(all_vacancies)
+        vacancies_processed = len(expected_salaries)
+
+        if vacancies_found and vacancies_processed:
+            average_salary = sum(expected_salaries) / vacancies_processed
+            analyzed_vacancies = {
+                'vacancies_found': vacancies_found,
+                'vacancies_processed': vacancies_processed,
+                'average_salary': int(average_salary),
+            }
+            analyzed_language_vacancies[f'{language}'] = analyzed_vacancies
+
+    return analyzed_language_vacancies
