@@ -90,23 +90,25 @@ class HeadHunterApi(BaseApi):
         professional_roles = self.get_json(endpoint=endpoint)
         return professional_roles['categories']
 
-    def get_role_id(self, query_industry, query_job, roles):
-        industry_jobs = None
-
-        for role in roles:
-            if query_industry in role['name']:
-                industry_jobs = role['roles']
-
-        for industry_job in industry_jobs:
-            if query_job in industry_job['name']:
-                role_id = industry_job['id']
-                return role_id
-
     def get_vacancies(self, params, page=None):
         endpoint = 'vacancies'
         params.update({'page': page})
         vacancies = self.get_json(endpoint=endpoint, params=params)
         return vacancies
+
+    def get_all_vacancies(self, params):
+        all_vacancies = []
+        page, pages = self.get_number_pages(params)
+
+        while page < pages:
+            vacancies = self.get_vacancies(params, page=page)
+            all_vacancies.extend(vacancies['items'])
+            page += 1
+        return all_vacancies
+
+    def get_number_pages(self, params):
+        vacancies = self.get_vacancies(params)
+        return vacancies['page'], vacancies['pages']
 
     @staticmethod
     def predict_rub_salary(vacancies):
@@ -132,16 +134,15 @@ class HeadHunterApi(BaseApi):
 
         return expected_salaries
 
-    def get_all_vacancies(self, params):
-        all_vacancies = []
-        page, pages = self.get_number_pages(params)
+    @staticmethod
+    def get_role_id(query_industry, query_job, roles):
+        industry_jobs = None
 
-        while page < pages:
-            vacancies = self.get_vacancies(params, page=page)
-            all_vacancies.extend(vacancies['items'])
-            page += 1
-        return all_vacancies
+        for role in roles:
+            if query_industry in role['name']:
+                industry_jobs = role['roles']
 
-    def get_number_pages(self, params):
-        vacancies = self.get_vacancies(params)
-        return vacancies['page'], vacancies['pages']
+        for industry_job in industry_jobs:
+            if query_job in industry_job['name']:
+                role_id = industry_job['id']
+                return role_id
