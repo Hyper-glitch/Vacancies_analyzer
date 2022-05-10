@@ -29,10 +29,10 @@ class BaseApi:
 class SuperJob(BaseApi):
     """Class to interact with SuperJob API. Inherited from BaseApi"""
 
-    def get_authorize(self, client_id, url):
+    def get_authorize(self, client_id: int, url: str):
         """Get code for getting access token.
-        :param client_id: - application ID registered in the API
-        :param url: - url for user authorization request
+        :param client_id: - Application ID registered in the API
+        :param url: - Url for user authorization request
         """
         params = {
             'client_id': client_id,
@@ -41,7 +41,13 @@ class SuperJob(BaseApi):
         response = self.session.get(url=url, params=params)
         response.raise_for_status()
 
-    def get_access_token(self, client_id, secret_key, code):
+    def get_access_token(self, client_id: int, secret_key: str, code: str) -> str:
+        """Get access token for authorized requests.
+        :param client_id: - Application ID registered in the API
+        :param secret_key: - SuperJob's API client secret key
+        :param code: - Code, received in case of successful user authorization
+        :returns: access_token - Access_token. It must be passed to all methods that require authentication.
+        """
         endpoint = 'oauth2/access_token/'
         params = {
             'client_id': client_id,
@@ -52,10 +58,14 @@ class SuperJob(BaseApi):
         access_token = self.get_json(endpoint=endpoint, params=params)['access_token']
         return access_token
 
-    def get_vacancies(self, params):
+    def get_vacancies(self, params: dict) -> list:
+        """Get vacancies from SuperJob platform.
+        :param params: - Necessary information for getting data.
+        :returns: vacancies - Vacancies with all useful data about them.
+        """
         endpoint = 'vacancies'
-        vacancies = self.get_json(endpoint=endpoint, params=params)['objects']
-        return vacancies
+        vacancies = self.get_json(endpoint=endpoint, params=params)
+        return vacancies['objects']
 
     @staticmethod
     def predict_rub_salary(vacancies):
