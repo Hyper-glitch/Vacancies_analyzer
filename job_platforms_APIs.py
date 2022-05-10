@@ -2,8 +2,6 @@ import urllib.parse as urllib
 
 import requests
 
-from analyzer_tools import predict_salary
-
 
 class BaseApi:
     """Base API class which implements with all repeatable attributes and methods."""
@@ -67,24 +65,6 @@ class SuperJob(BaseApi):
         vacancies = self.get_json(endpoint=endpoint, params=params)
         return vacancies['objects']
 
-    @staticmethod
-    def predict_rub_salary(vacancies):
-        expected_salaries = []
-
-        for vacancy in vacancies:
-            currency = vacancy['currency']
-            start_salary = vacancy['payment_from']
-            end_salary = vacancy['payment_to']
-            currency_name = 'rub'
-
-            expected_salary = predict_salary(
-                currency=currency, start_salary=start_salary,
-                end_salary=end_salary, currency_name=currency_name
-            )
-            if expected_salary:
-                expected_salaries.append(expected_salary)
-        return expected_salaries
-
 
 class HeadHunterApi(BaseApi):
 
@@ -112,30 +92,6 @@ class HeadHunterApi(BaseApi):
     def get_number_pages(self, params):
         vacancies = self.get_vacancies(params)
         return vacancies['page'], vacancies['pages']
-
-    @staticmethod
-    def predict_rub_salary(vacancies):
-        expected_salaries = []
-
-        for vacancy in vacancies:
-            salary = vacancy['salary']
-
-            if not salary:
-                continue
-
-            currency = salary['currency']
-            start_salary = salary['from']
-            end_salary = salary['to']
-            currency_name = 'RUR'
-
-            expected_salary = predict_salary(
-                currency=currency, start_salary=start_salary,
-                end_salary=end_salary, currency_name=currency_name
-            )
-            if expected_salary:
-                expected_salaries.append(expected_salary)
-
-        return expected_salaries
 
     @staticmethod
     def get_role_id(query_industry, query_job, roles):
