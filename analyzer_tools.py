@@ -1,3 +1,7 @@
+"""Module for functions, that helps analyze vacancies"""
+from terminaltables import AsciiTable
+
+
 def predict_salary(currency, start_salary, end_salary, currency_name):
     expected_salary = None
 
@@ -40,3 +44,17 @@ def get_analyzed_vacancies(api, programming_languages: list, search_key: str, va
             analyzed_language_vacancies[f'{language}'] = analyzed_vacancies
 
     return analyzed_language_vacancies
+
+
+def show_vacancies_statistics(analyzed_vacancies, title):
+    table_data = [
+        ('Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата')
+    ]
+    for language, vacancies_statistics in analyzed_vacancies.items():
+        vacancies_found = vacancies_statistics['vacancies_found']
+        vacancies_processed = vacancies_statistics['vacancies_processed']
+        average_salary = vacancies_statistics['average_salary']
+        table_data.append([language, vacancies_found, vacancies_processed, average_salary])
+
+    hh_table = AsciiTable(table_data=table_data, title=title)
+    print(hh_table.table)
