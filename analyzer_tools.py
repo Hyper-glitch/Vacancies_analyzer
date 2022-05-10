@@ -46,7 +46,7 @@ def predict_rub_salary(vacancies, super_job_indicator):
     """Predict salary based on start or end salary range.
     :param vacancies: - All vacancies that we need to analyze.
     :param super_job_indicator: - The indicator, that show us what is API service we work with.
-    :returns: expected_salaries - salary that we expected from start or end salary range.
+    :returns: expected_salaries - all analyzed RUB salaries that we expected for statistics.
     """
     expected_salaries = []
 
@@ -105,9 +105,11 @@ def show_statistics(statistics, title):
         ('Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата')
     ]
     for language, vacancies_statistics in statistics.items():
+
         vacancies_found = vacancies_statistics['vacancies_found']
         vacancies_processed = vacancies_statistics['vacancies_processed']
         average_salary = vacancies_statistics['average_salary']
+
         table_data.append([language, vacancies_found, vacancies_processed, average_salary])
 
     hh_table = AsciiTable(table_data=table_data, title=title)
