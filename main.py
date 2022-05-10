@@ -11,10 +11,6 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
 
     headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
     base_url = 'https://api.hh.ru/'
-    area_id = 2  # todo add location resolver
-    period = 30
-    per_page = 100
-    search_key = 'text'
     title = 'HeadHunter Санкт-Петербург'
 
     hh_api = HeadHunterApi(base_url=base_url, headers=headers)
@@ -27,15 +23,17 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
     )
     params = {
         'professional_role': developer_role_id,
-        'area': area_id,
-        'period': period,
-        'per_page': per_page,
+        'area': 2,
+        'period': 30,
+        'per_page': 100,
     }
-    analyzed_vacancies = get_analyzed_vacancies(
-        api=hh_api, search_key=search_key,
-        programming_languages=programming_languages,
-        vacancies_params=params,
-    )
+    kwargs = {
+        'api': hh_api,
+        'search_key': 'text',
+        'programming_languages': programming_languages,
+        'vacancies_params': params,
+    }
+    analyzed_vacancies = get_analyzed_vacancies(**kwargs)
     show_vacancies_statistics(analyzed_vacancies=analyzed_vacancies, title=title)
 
 
@@ -48,7 +46,6 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
     town = 'Санкт-Петербург'
     title = f'SuperJob {town}'
     catalogues = 33
-    search_key = 'keyword'
     params = {
         'client_id': client_id,
         'secret_key': secret_key,
@@ -62,11 +59,13 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
         sj_api.get_authorize(client_id=client_id, url=auth_url)
         access_token = sj_api.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
 
-    analyzed_vacancies = get_analyzed_vacancies(
-        api=sj_api, search_key=search_key,
-        programming_languages=programming_languages,
-        vacancies_params=params,
-    )
+    kwargs = {
+        'api': sj_api,
+        'search_key': 'keyword',
+        'programming_languages': programming_languages,
+        'vacancies_params': params,
+    }
+    analyzed_vacancies = get_analyzed_vacancies(**kwargs)
     show_vacancies_statistics(analyzed_vacancies=analyzed_vacancies, title=title)
 
 
