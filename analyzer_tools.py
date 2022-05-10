@@ -1,9 +1,16 @@
-"""Module for functions, that helps analyze vacancies"""
+"""Module with functions, that helps analyze vacancies"""
 from terminaltables import AsciiTable
 
 
-def get_analyzed_vacancies(api, programming_languages: list, search_key: str, vacancies_params: dict):
-    analyzed_language_vacancies = {}
+def get_statistics(api, programming_languages: list, search_key: str, vacancies_params: dict):
+    """Get vacancies with certain page.
+    :param api: - Necessary information for getting data.
+    :param programming_languages: - SuperJob's API client secret key.
+    :param search_key: - SuperJob's API client secret key.
+    :param vacancies_params: - SuperJob's API client secret key.
+    :returns: statistics - Vacancies with all useful data at certain page.
+    """
+    statistics = {}
     super_job_search_key = 'keyword'
     super_job_indicator = False
 
@@ -28,16 +35,16 @@ def get_analyzed_vacancies(api, programming_languages: list, search_key: str, va
                 'vacancies_processed': vacancies_processed,
                 'average_salary': int(average_salary),
             }
-            analyzed_language_vacancies[f'{language}'] = analyzed_vacancies
+            statistics[f'{language}'] = analyzed_vacancies
 
-    return analyzed_language_vacancies
+    return statistics
 
 
-def show_vacancies_statistics(analyzed_vacancies, title):
+def show_statistics(statistics, title):
     table_data = [
         ('Язык программирования', 'Вакансий найдено', 'Вакансий обработано', 'Средняя зарплата')
     ]
-    for language, vacancies_statistics in analyzed_vacancies.items():
+    for language, vacancies_statistics in statistics.items():
         vacancies_found = vacancies_statistics['vacancies_found']
         vacancies_processed = vacancies_statistics['vacancies_processed']
         average_salary = vacancies_statistics['average_salary']
