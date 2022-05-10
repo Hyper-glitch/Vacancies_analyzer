@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from analyzer_tools import get_analyzed_vacancies, show_vacancies_statistics
+from analyzer_tools import get_statistics, show_statistics
 from job_platforms_APIs import HeadHunterApi, SuperJob
 
 
@@ -33,8 +33,8 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
         'programming_languages': programming_languages,
         'vacancies_params': params,
     }
-    analyzed_vacancies = get_analyzed_vacancies(**kwargs)
-    show_vacancies_statistics(analyzed_vacancies=analyzed_vacancies, title=title)
+    statistics = get_statistics(**kwargs)
+    show_statistics(statistics=statistics, title=title)
 
 
 def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
@@ -65,8 +65,8 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
         'programming_languages': programming_languages,
         'vacancies_params': params,
     }
-    analyzed_vacancies = get_analyzed_vacancies(**kwargs)
-    show_vacancies_statistics(analyzed_vacancies=analyzed_vacancies, title=title)
+    statistics = get_statistics(**kwargs)
+    show_statistics(statistics=statistics, title=title)
 
 
 def main():
