@@ -7,6 +7,8 @@ from job_platforms_APIs import HeadHunterApi, SuperJob
 
 
 def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_app_email: str):
+    """Initialize api and run methods for getting and analyzing HeadHunter vacancies."""
+
     headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
     base_url = 'https://api.hh.ru/'
     area_id = 2  # todo add location resolver
@@ -38,6 +40,8 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
 
 
 def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
+    """Initialize api and run methods for getting and analyzing SuperJob vacancies."""
+
     headers = {'X-Api-App-Id': secret_key}
     base_url = 'https://api.superjob.ru/2.0/'
     auth_url = 'https://www.superjob.ru/authorize/'
@@ -76,9 +80,11 @@ def main():
     sj_secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
     sj_code = os.environ.get("CODE")
 
-    programming_languages = ['JavaScript', 'C#', 'Java',
-                             'Python', 'PHP', 'TypeScript',
-                             'Kotlin', 'Swift', 'C++', 'Go']
+    programming_languages = [
+        'JavaScript', 'C#', 'Java',
+        'Python', 'PHP', 'TypeScript',
+        'Kotlin', 'Swift', 'C++', 'Go',
+    ]
 
     run_head_hunter_analyzer(
         programming_languages=programming_languages, hh_app_name=hh_app_name, hh_app_email=hh_app_email,
