@@ -2,7 +2,7 @@ import os
 
 from dotenv import load_dotenv
 
-from analyzer_tools import get_analyzed_vacancies
+from analyzer_tools import get_analyzed_vacancies, show_vacancies_statistics
 from job_platforms_APIs import HeadHunterApi, SuperJob
 
 
@@ -13,6 +13,7 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
     period = 30
     per_page = 100
     search_key = 'text'
+    title = 'HeadHunter Санкт-Петербург'
 
     hh_api = HeadHunterApi(base_url=base_url, headers=headers)
 
@@ -33,7 +34,7 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
         programming_languages=programming_languages,
         vacancies_params=params,
     )
-    print(analyzed_vacancies)
+    show_vacancies_statistics(analyzed_vacancies=analyzed_vacancies, title=title)
 
 
 def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
@@ -41,6 +42,7 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
     base_url = 'https://api.superjob.ru/2.0/'
     auth_url = 'https://www.superjob.ru/authorize/'
     town = 'Санкт-Петербург'
+    title = f'SuperJob {town}'
     catalogues = 33
     search_key = 'keyword'
     params = {
@@ -56,12 +58,12 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
         sj_api.get_authorize(client_id=client_id, url=auth_url)
         access_token = sj_api.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
 
-    analyzed_language_vacancies = get_analyzed_vacancies(
+    analyzed_vacancies = get_analyzed_vacancies(
         api=sj_api, search_key=search_key,
         programming_languages=programming_languages,
         vacancies_params=params,
     )
-    print(analyzed_language_vacancies)
+    show_vacancies_statistics(analyzed_vacancies=analyzed_vacancies, title=title)
 
 
 def main():
@@ -73,6 +75,7 @@ def main():
     sj_client_id = int(os.environ.get("SUPER_JOB_CLIENT_ID"))
     sj_secret_key = os.environ.get("SUPER_JOB_SECRET_KEY")
     sj_code = os.environ.get("CODE")
+
     programming_languages = ['JavaScript', 'C#', 'Java',
                              'Python', 'PHP', 'TypeScript',
                              'Kotlin', 'Swift', 'C++', 'Go']
