@@ -66,7 +66,7 @@ class SuperJob(BaseApi):
         return vacancies['objects']
 
 
-class HeadHunterApi(BaseApi):
+class HeadHunter(BaseApi):
     """Class to interact with HeadHunter API. Inherited from BaseApi"""
 
     def get_professional_roles(self) -> list:
@@ -95,7 +95,7 @@ class HeadHunterApi(BaseApi):
         vacancies = self.get_vacancies(params)
         page, pages = vacancies['page'], vacancies['pages']
 
-        while page < pages:
+        while page <= pages:
             vacancies = self.get_vacancies(params, page=page)
             all_vacancies.extend(vacancies['items'])
             page += 1
