@@ -3,17 +3,17 @@ import os
 from dotenv import load_dotenv
 
 from analyzer_tools import get_statistics, show_statistics
-from job_platforms_APIs import HeadHunterApi, SuperJob
+from api_job_platforms import HeadHunter, SuperJob
 
 
-def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_app_email: str):
+def analyze_head_hunter(programming_languages: list, hh_app_name: str, hh_app_email: str):
     """Initialize api and run methods for getting and analyzing HeadHunter vacancies."""
 
     headers = {'User-Agent': f'{hh_app_name}-{hh_app_email}'}
     base_url = 'https://api.hh.ru/'
     title = 'HeadHunter Санкт-Петербург'
 
-    hh_api = HeadHunterApi(base_url=base_url, headers=headers)
+    hh_api = HeadHunter(base_url=base_url, headers=headers)
 
     professional_roles = hh_api.get_professional_roles()
     developer_role_id = hh_api.get_role_id(
@@ -21,23 +21,20 @@ def run_head_hunter_analyzer(programming_languages: list, hh_app_name: str, hh_a
         query_job='Программист',
         roles=professional_roles,
     )
-    params = {
+    vacancies_params = {
         'professional_role': developer_role_id,
         'area': 2,
         'period': 30,
         'per_page': 100,
     }
-    kwargs = {
-        'api': hh_api,
-        'search_key': 'text',
-        'programming_languages': programming_languages,
-        'vacancies_params': params,
-    }
-    statistics = get_statistics(**kwargs)
+    statistics = get_statistics(
+        api=hh_api, search_key='text', programming_languages=programming_languages,
+        vacancies_params=vacancies_params,
+    )
     show_statistics(statistics=statistics, title=title)
 
 
-def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
+def analyze_super_job(programming_languages, client_id, secret_key, code):
     """Initialize api and run methods for getting and analyzing SuperJob vacancies."""
 
     headers = {'X-Api-App-Id': secret_key}
@@ -46,7 +43,7 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
     town = 'Санкт-Петербург'
     title = f'SuperJob {town}'
     catalogues = 33
-    params = {
+    vacancies_params = {
         'client_id': client_id,
         'secret_key': secret_key,
         'catalogues': catalogues,
@@ -59,17 +56,14 @@ def run_super_job_analyzer(programming_languages, client_id, secret_key, code):
         sj_api.get_authorize(client_id=client_id, url=auth_url)
         access_token = sj_api.get_access_token(client_id=client_id, secret_key=secret_key, code=code)
 
-    kwargs = {
-        'api': sj_api,
-        'search_key': 'keyword',
-        'programming_languages': programming_languages,
-        'vacancies_params': params,
-    }
-    statistics = get_statistics(**kwargs)
+    statistics = get_statistics(
+        api=sj_api, search_key='keyword', programming_languages=programming_languages,
+        vacancies_params=vacancies_params,
+    )
     show_statistics(statistics=statistics, title=title)
 
 
-def main():
+def vacancies_analyzer():
     """The main logic for running the whole program."""
     load_dotenv()
 
@@ -85,13 +79,13 @@ def main():
         'Kotlin', 'Swift', 'C++', 'Go',
     ]
 
-    run_head_hunter_analyzer(
+    analyze_head_hunter(
         programming_languages=programming_languages, hh_app_name=hh_app_name, hh_app_email=hh_app_email,
     )
-    run_super_job_analyzer(
+    analyze_super_job(
         programming_languages=programming_languages, client_id=sj_client_id, secret_key=sj_secret_key, code=sj_code,
     )
 
 
 if __name__ == '__main__':
-    main()
+    vacancies_analyzer()
